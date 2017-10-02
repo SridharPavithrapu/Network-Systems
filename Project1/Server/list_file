@@ -1,8 +1,0 @@
-udp_server.c
-.
-udp_server
-Makefile
-list_file
-..
-udp_server.o
-new_file
