@@ -2,8 +2,7 @@ INCLUDE_DIRS =
 LIB_DIRS = 
 CC=gcc
 
-CDEFS=
-CFLAGS= -O0 -g $(INCLUDE_DIRS) $(CDEFS)
+CFLAGS= -O0 -g $(INCLUDE_DIRS)
 LIBS= 
 
 HFILES= 
@@ -18,10 +17,6 @@ clean:
 	-rm -f *.o *.d
 	-rm -f server
 
-feasibility_tests: server.o
-	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ $@.o -lm
+%.o: %.c $(SRCS)
+	$(CC) -c -o $@ $< $(CFLAGS)
 
-depend:
-
-.c.o:
-	$(CC) $(CFLAGS) -c $<
