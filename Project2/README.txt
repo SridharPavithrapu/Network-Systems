@@ -1,107 +1,75 @@
 CSCI-ECEN​ ​4273-5273
 Programming​ ​Assignment-2
-UDP​ ​Socket​ ​Programming
+HTTP-based web server
 
 Submitted​ ​by:
 Sridhar​ ​Pavithrapu
 
-I​ ​have​ ​implemented​ ​web-server​ ​for​ ​transmitting​ ​information​ ​between​ ​a​ ​server
-and​ ​a​ ​client.
+I​ ​have​ ​implemented​ ​HTTP web-server​ ​for​ ​transmitting​ ​information​ ​of requested web pages from a​ ​client(web-browser/telnet).
 
-Here,​ ​I​ ​have​ ​created​ ​two​ ​folders​ ​‘​ ​clientFolder​ ​’​ ​and​ ​‘​ ​serverFolder​ ​’.
-The​ ​‘​ ​serverFolder​ ​’​ ​consists​ ​of​ ​‘​ ​Makefile​ ​’​ ​,‘​ ​server.c​ ​’​ ​and​ ​files​ ​for​ ​transfer.
-Whereas​ ​the​ ​‘​ ​clientFolder​ ​’​ ​consists​ ​of​ ​‘​ ​Makefile​ ​’​ ​and​ ​‘​ ​client.c​ ​’​ ​files.
+Here,​ ​I​ ​have​ ​created​ folder named​ ​‘​ ​server​​ ’.
+
+The​ ​‘​ ​server ​’ folder  ​consists​ ​of​ ​‘​ ​Makefile​ ​’​ ​,‘​ ​server.c​ ​’​ , 'ws_conf' ​and​ 'root folder' for sending requested contents to web-browser.
 
 Server:
-In​ ​this​ ​assignment,​ ​I​ ​have​ ​written​ ​server​ ​which​ ​has​ ​below​ ​interfaces​ ​and​ ​their
-functionality:
+In​ ​this​ ​assignment,​ ​I​ ​have​ ​written​ ​server​ ​which​ ​has​ ​below​ ​interfaces​ ​and​ ​their functionality:
 
-server_get_file:​​ ​This​ ​interface​ ​is​ ​used​ ​to​ ​send​ ​the​ ​file​ ​contents​ ​requested​ ​by​ ​client.
-First​ ​the​ ​server​ ​receives​ ​the​ ​file​ ​name​ ​needed​ ​from​ ​the​ ​client.​ ​Then​ ​server​ ​checks
-whether​ ​the​ ​file​ ​exists​ ​or​ ​not.​ ​If​ ​the​ ​file​ ​exists,​ ​then​ ​the​ ​server​ ​sends​ ​the​ ​file
-contents​ ​to​ ​the​ ​client.
+send_notFoundError: This interface is used to send the HTTP error:404, i.e., file requested is not found.
 
-server_put_file:​​ ​This​ ​interface​ ​is​ ​used​ ​to​ ​store​ ​file​ ​contents​ ​received​ ​by​ ​client.
-First​ ​the​ ​client​ ​sends​ ​the​ ​size​ ​of​ ​the​ ​new​ ​file​ ​to​ ​be​ ​created.​ ​Then​ ​the​ ​server​ ​creates
-the​ ​new​ ​file​ ​and​ ​store​ ​the​ ​received​ ​contents​ ​in​ ​it.
+send_fileInformation: This interface first checks whether the requested file from the web-browser is present in the 'root folder'. 
+				  If the file is present, then sends the file information, otherwise sends the error message to web-browser.
 
-server_delete_file:​ ​This​ ​interface​ ​is​ ​used​ ​to​ ​delete​ ​the​ ​file​ ​requested​ ​by​ ​client.
+send_badRequestError: This interface is used to send the HTTP error:400, i.e., bad request method, URL or HTTP version.
 
-server_hash_value:​ ​This​ ​interface​ ​is​ ​used​ ​to​ ​print​ ​the​ ​hash​ ​value​ ​of​ ​the​ ​file
-requested​ ​by​ ​the​ ​client.
+send_notImplementedError: This interface is used to send the HTTP error:501, i.e., the requested file is not implemented/present.
 
-server_list_directory:​​ ​This​ ​interface​ ​is​ ​used​ ​to​ ​list​ ​the​ ​files​ ​present​ ​in​ ​the​ ​directory
-and​ ​send​ ​its​ ​content​ ​to​ ​client​ ​upon​ ​request.
+send_postFileInformation: This interface first checks whether the requested file from the web-browser is present in the 'root folder'.
+					 If the file is present, then sends the file information along with the POST data with <pre> header, otherwise sends the error message to web-browser.
 
-server_exit_server:​​ ​This​ ​interface​ ​is​ ​used​ ​to​ ​exit​ ​the​ ​server​ ​upon​ ​request​ ​by​ ​client.
+service_request: This interface receives the request from web-browser, then the request is parsed to check whether it has the valid HTTP protocol, URI and requested method.
+		       If the above query satisfies, then the web-server sends the corresponding valid response, otherwise it sends error message. 
+			  It also executes the POST request from the web-browser and also supports pipelining.
 
-Client:
+parse_config: This interface is used to parse the 'ws_conf' file.
 
-In​ ​this​ ​assignment,​ ​I​ ​have​ ​written​ ​client​ ​which​ ​has​ ​below​ ​interfaces​ ​and​ ​their
-functionality:
+signal_callback_handler: This interface is a signal callback handler, which recieves the "ctrl+c" requests and gracefully exits the web-server, by closing all required connections created.
 
-client_get_file:​​ ​This​ ​interface​ ​is​ ​used​ ​to​ ​request​ ​file​ ​from​ ​server.​ ​First​ ​the​ ​client
-requests​ ​the​ ​file​ ​needed​ ​by​ ​sending​ ​the​ ​file​ ​name​ ​to​ ​the​ ​server.​ ​Then​ ​the​ ​client
-creates​ ​the​ ​new​ ​file​ ​and​ ​store​ ​the​ ​received​ ​contents​ ​in​ ​it.
+main: This interface creates the socket for TCP connection, and creates child processes(using 'fork') for any connection from the web-browser and this child process services the requests
+	 received from web-browser.
 
-client_put_file:​​ ​This​ ​interface​ ​is​ ​used​ ​to​ ​send​ ​the​ ​file​ ​contents​ ​to​ ​server.​ ​First​ ​the
-client​ ​checks​ ​whether​ ​the​ ​file​ ​exists​ ​or​ ​not.​ ​If​ ​the​ ​file​ ​exists,​ ​then​ ​the​ ​client​ ​sends
-the​ ​file​ ​contents​ ​to​ ​the​ ​server.
 
-client_delete_file:​ ​This​ ​interface​ ​is​ ​used​ ​to​ ​request​ ​server​ ​to​ ​delete​ ​the​ ​file.
+Extra-Credit:
 
-client_hash_value:​ ​This​ ​interface​ ​is​ ​used​ ​to​ ​print​ ​the​ ​hash​ ​value​ ​of​ ​the​ ​file
-requested​ ​by​ ​the​ ​user.
+Pipelining:
 
-client_list_directory:​​ ​This​ ​interface​ ​is​ ​used​ ​to​ ​get​ ​the​ ​server​ ​directory​ ​contents.
+I have implemented pipelining functionality by keeping 'time-out', whose value is read from 'ws_conf' file.
+Then, once the request is processed from web-browser, If the connection is 'Keep-alive', the timer will be run using 'select' interface, to check for any further requests.
 
-client_exit_server:​​ ​This​ ​interface​ ​is​ ​used​ ​to​ ​request​ ​server​ ​to​ ​exit.
+If there is any request within the time-out, then the corresponsing request is processed. This process continues till,
+no further requests are received within the time-out or if the connection type is other than 'Keep-alive'
 
-Reliability:
+POST method:
 
-In​ ​this​ ​assignment,​ ​the​ ​reliability​ ​is​ ​implemented​ ​using​ ​stop​ ​and​ ​wait​ ​protocol.
-Here,​ ​first​ ​the​ ​sender​ ​sends​ ​the​ ​packet,​ ​then​ ​wait​ ​for​ ​a​ ​timeout​ ​to​ ​receive​ ​the
-acknowledgement.​ ​In​ ​this​ ​case​ ​I’m​ ​using​ ​packet​ ​number​ ​as​ ​acknowledgement.​ ​If​ ​I
-receive​ ​the​ ​required​ ​acknowledgement​ ​then​ ​I’ll​ ​send​ ​the​ ​next​ ​packet,​ ​otherwise​ ​I’ll
-send​ ​the​ ​same​ ​packet​ ​which​ ​is​ ​previously​ ​sent.
-
-Encryption:
-
-I​ ​have​ ​used​ ​‘XOR​ ​Encryption’​ ​for​ ​implementing​ ​encryption​ ​for​ ​the​ ​messages​ ​sent
-between​ ​server​ ​and​ ​client.
+I have implemented POST method, and created a new HTML page named 'post.html' which is present in the 'root' folder.
+This post.html file has a form which takes first-name and last-name as input, when submit button is pressed, it sends a post request to webserver.
+Upon receiving this post request, the web-server parses the content received, and sends the response with POST data with <pre> header in the HTML page along with the post.html content.
 
 Executing​ ​Instructions:
 
-Both​ ​the​ ​server​ ​and​ ​client​ ​consists​ ​of​ ​makefile.​ ​The​ ​server​ ​code​ ​and​ ​client​ ​code​ ​is
+The​ ​'server' folder​ ​consists​ ​of​ ​makefile.​ ​The​ ​server​ ​code​ ​is
 compiled​ ​by​ ​running​ ​the​ ​‘make’​ ​command.
 
-Client​ ​is​ ​executed​ ​by​ ​running​ ​the​ ​command:
+Server ​is​ ​executed​ ​by​ ​running​ ​the​ ​command:
 
-First​ ​find​ ​the​ ​remote​ ​ip​ ​address.​ ​Then​ ​execute​ ​the​ ​below​ ​command:
-./client​ ​128.138.201.66​ ​5000
-[./client​ ​‘remote​ ​ip​ ​address’​ ​‘port​ ​number’]
 
-Server​ ​is​ ​executed​ ​by​ ​running​ ​the​ ​command:
-./server​ ​5000
-[./server​ ​‘port​ ​number’]
+./server​
+[./server​]
 
-Once​ ​both​ ​the​ ​server​ ​and​ ​client​ ​is​ ​executed,​ ​user​ ​can​ ​see​ ​the​ ​menu​ ​for​ ​giving
-different​ ​operations​ ​as​ ​shown​ ​below:
+Here, the client can either be any web-browser or telnet.
+If web-browser is used. Then any request to the web-server is sent by the following command:
+http://127.0.0.1:8089/exam.gif
+[http://ip-address:port-number/file-name​]
+ 
 
-For​ ​different​ ​operations,​ ​following​ ​commands​ ​should​ ​be​ ​given​ ​by​ ​the​ ​user:
-1)​ ​For​ ​‘get’​ ​functionality:
-	get​ ​‘file_name’
-2)​ ​For​ ​‘put’​ ​functionality:
-	put​ ​‘file_name’
-3)​ ​For​ ​‘delete’​ ​functionality:
-	delete​ ​‘file_name’
-4)​ ​For​ ​server​ ​contents:
-	ls
-5)​ ​For​ ​hash​ ​value​ ​of​ ​the​ ​file:
-	md5um​ ​‘file_name’
-6)​ ​To​ ​exit​ ​the​ ​server:
-	exit
-
-After​ ​every​ ​operation​ ​performed,​ ​user​ ​will​ ​be​ ​prompted​ ​by​ ​the​ ​above​ ​menu​ ​options
-continuously​ ​until​ ​the​ ​exit​ ​command​ ​is​ ​given.
+Signal handler is implemented to gracefully exit the web-server.
 
