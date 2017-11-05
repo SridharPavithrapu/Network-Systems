@@ -230,8 +230,11 @@ int service_request(int connection)
 			
 			sprintf(user_directory_name,"%s/%s",rootPath,temp->recv_user_name);
 			printf("Directory name:%s\n",user_directory_name);
-			int result = mkdir(user_directory_name,0777);
-			printf("Make directory result:%d\n",result);
+			char temp_sridhar[BUFFER];
+			sprintf(temp_sridhar,"mkdir %s",user_directory_name);
+			system(temp_sridhar);
+			//int result = mkdir(user_directory_name,0777);
+			//printf("Make directory result:%d\n",result);
 		}
 		else
 		{

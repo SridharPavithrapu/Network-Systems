@@ -422,6 +422,7 @@ int client_put_file(char *file_name)
 					int bytes_read;
 					char datagram_message[BUFFER];
 					int chunk_sent = filesize - 3*file_chunk;
+					fseek(putfile, 3*chunk_sent, SEEK_SET);
 					bzero(packet_message,sizeof(packet_message));
 					sprintf(packet_message,"%d %d",packet_count,chunk_sent);
 					for(int x=0;x<2;x++)
